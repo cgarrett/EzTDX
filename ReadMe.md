@@ -1,11 +1,10 @@
 # EzTDX
 ## What is this?
-A Python wrapper for the [TDX Rest APIs](https://api.teamdynamix.com/TDWebApi/). Currently, the wrapper focuses on tickets, time entry, and people/users, but can be, and should be expanded to 
+A Python wrapper for the [TeamDynamix Rest APIs](https://api.teamdynamix.com/TDWebApi/). Currently, the wrapper focuses on tickets, time entry, and people/users, but can be, and should be expanded to 
 include Projects, Assets, etc.
 ## How do I use it in my project?
 I'm glad you asked. It's meant to be as simple as possible to use and extend. If you follow the code patterns in the EzTDX.py 
-file, you should be able to add new TDX API functionality with ease. To use the library in your project, you need to download
-the EzTDX.py file and put it in your project folder. Then import it in your application file.
+file, you should be able to add new TDX API functionality with ease. To use the library in your project, you need to run ```pip install EzTDX```. Then import it in your application file.
 
 ```
 from EzTDX import EzTDX
