@@ -21,7 +21,7 @@
     of any functions that are added.
 """
 
-__version__ = "2021.06.04"
+__version__ = "2021.06.11"
 
 import datetime as dt
 import json
@@ -96,6 +96,18 @@ class EzTDX():
         except Exception as ex:
             self.log(f'Error in get_people_groups: {ex}')
 
+    def get_ticket_config_items(self, ticket_id: int) -> List[str]:
+        """ Gets a list of configuration items attached to a ticket
+            - ticket_id: int: The ID of the ticket
+        """
+        try:
+            # prevents breaking rate limiting
+            sleep(1.125)
+
+            return self._get_data(f'/{self.app_id}/tickets/{ticket_id}/assets')
+        except Exception as ex:
+            self.log(f'Error in get_ticket_config_items: {ex}')
+
     def get_ticket_by_id(self, ticket_id: str) -> dict:
         """ Gets a single ticket by it's id
             - ticket_id: The ID of the ticket
@@ -120,6 +132,18 @@ class EzTDX():
             return ticket['Description']
         except Exception as ex:
             self.log(f'Error in get_ticket_description: {ex}')
+
+    def get_ticket_feed(self, ticket_id: str) -> List[str]:
+        """ Get ticket feed from ID
+            - ticket_id: Ticket ID
+        """
+        try:
+            # prevents breaking rate limiting
+            sleep(1.125)
+
+            return self._get_data(f'/{self.app_id}/tickets/{ticket_id}/feed')
+        except Exception as ex:
+            self.log(f'Error in get_ticket_feed: {ex}')
 
     def get_ticket_status_id(self, txt_status: str) -> int:
         """ Return ticket status id from text name
@@ -228,6 +252,22 @@ class EzTDX():
                 return tickets
         except Exception as ex:
             self.log(f'Error in search_tickets: {ex}')
+
+    def search_tickets_custom(self, search_criteria: dict, ticket_status: List[str] = ['New'], max_results: int = 5) -> List[str]:
+        """ Searches for tickets with more specific criteria
+            - search_criteria: Dictionary: Search info to search with
+            - ticket_status: List of ticket statuses to filter on (default: New tickets)
+            - max_results: How many tickets to return (default: 5 tickets)
+        """
+        try:
+            search_criteria['StatusIDs'] = self.get_ticket_status_ids(ticket_status)
+
+            response = self.session.post(f'{self.BASE_URL}/{self.app_id}/tickets/search', data=search_criteria)
+
+            if response.status_code == 200:
+                return json.loads(response.text)
+        except Exception as ex:
+            self.log(f'Error in search_tickets_custom: {ex}')
 
     def search_time_entries(self, entry_date_from: str, entry_date_to: str, person_ids: List[str]=[], max_results: int=1000) -> List[str]:
         """Search for time entered
