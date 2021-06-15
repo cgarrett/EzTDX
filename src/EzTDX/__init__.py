@@ -21,7 +21,7 @@
     of any functions that are added.
 """
 
-__version__ = "2021.06.11"
+__version__ = "2021.06.14"
 
 import datetime as dt
 import json
