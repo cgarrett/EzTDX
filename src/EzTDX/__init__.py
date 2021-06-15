@@ -212,8 +212,6 @@ class EzTDX():
 
             print(f'{now} - {msg}')
 
-            with open('last_run.log','a') as last_run:
-                last_run.write(f'{now} - {msg}\n')
         except Exception as ex:
             print(f'Error writing to log: {ex}')
 
