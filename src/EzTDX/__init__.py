@@ -21,7 +21,7 @@
     of any functions that are added.
 """
 
-__version__ = "2021.06.17.01"
+__version__ = "2021.06.18"
 
 import datetime as dt
 import json
@@ -462,7 +462,7 @@ class EzTDX():
                 'TicketID' : ticket_id,
                 'Title' : title,
                 'EstimatedMinutes' : estimated_minutes,
-                'PercentComplee' : percent_complete
+                'PercentComplete' : percent_complete
             }
 
             response = self.session.put(f'{self.BASE_URL}/{self.app_id}/tickets/{ticket_id}/tasks/{task_id}', data=data)
@@ -484,7 +484,7 @@ class EzTDX():
 
         try:
             data = {
-                'PercentComplee' : percent_complete,
+                'PercentComplete' : percent_complete,
                 'Comments' : comments,
                 'Notify' : notify,
                 'IsPrivate': is_private
