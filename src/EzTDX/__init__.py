@@ -21,10 +21,11 @@
     of any functions that are added.
 """
 
-__version__ = "2021.06.14"
+__version__ = "2021.06.17"
 
 import datetime as dt
 import json
+from requests.models import Response
 from requests.sessions import Session
 from typing import Any, List
 from time import sleep
@@ -77,7 +78,52 @@ class EzTDX():
                 raise Exception(f'Error: get_data(): {response.status_code} : {api}')
         except Exception as ex:
             raise Exception(f'Exception in generic_get: {ex}')
-            
+
+    def add_people_to_group(self, group_id: int, guids: List[str], is_primary: str = 'false', is_notified: str = 'true', is_manager: str = 'false') -> str:
+        """ Add list of guids to group """
+        try:
+            api = f'{self.BASE_URL}/groups/{group_id}/members?isPrimary={is_primary}&isNotified={is_notified}&isManager={is_manager}'
+
+            response = self.session.post(api, data = guids, headers={'content-type' : 'application/json'})
+
+            if response.status_code == 200:
+                return response.text
+            else:
+                raise Exception(response.text)
+        except Exception as ex:
+            self.log(f'Error in add_people_to_group: {ex}')
+
+    def add_time_entry(self, time_entry: dict) -> Any:
+        """ Create a time entry 
+            - time_entry: TeamDynamix.Api.Time.TimeEntry 
+            https://api.teamdynamix.com/TDWebApi/Home/type/TeamDynamix.Api.Time.TimeEntry
+        """
+        try:
+            api = f'{self.BASE_URL}/time'
+
+            response = self.session.post(api, data = time_entry, headers={'content-type' : 'application/json'})
+
+            if response.status_code == 200:
+                return response.text
+            else:
+                raise Exception(response.text)
+        except Exception as ex:
+            self.log(f'Error in add_time_entry: {ex}')
+
+    def get_group(self, group_id: int) -> dict:
+        """Get Group by ID """
+        try:
+            return self._get_data(f'/groups/{group_id}')
+        except Exception as ex:
+            self.log(f'Error in get_group: {ex}')
+
+    def get_group_members(self, group_id: int) -> List[dict]:
+        """Get Group members by ID """
+        try:
+            return self._get_data(f'/groups/{group_id}/members')
+        except Exception as ex:
+            self.log(f'Error in get_group_members: {ex}')
+
     def get_person(self, user_id: str) -> Any:
         """Get User by ID"""
         try:
@@ -96,6 +142,31 @@ class EzTDX():
         except Exception as ex:
             self.log(f'Error in get_people_groups: {ex}')
 
+    def get_ticket_attribute(self, ticket_id: int, attribute_name: str) -> Any:
+        """ Gets a ticket attribute from a ticket
+            - ticket_id: int: The ID of the ticket
+            - attribute_name: string: Attribute name to retrieve
+        """
+        try:
+            ticket = self.get_ticket_by_id(ticket_id)
+
+            for attribute in ticket['Attributes']:
+                if attribute['Name'] == attribute_name:
+                    return attribute['ValueText']
+            return 'N/A'
+        except Exception as ex:
+            self.log(f'Error in get_ticket_attribute: {ex}')
+
+    def get_ticket_by_id(self, ticket_id: str) -> dict:
+        """ Gets a single ticket by it's id
+            - ticket_id: The ID of the ticket
+        """
+        try:
+            api = f'/{self.app_id}/tickets/{ticket_id}'
+            return self._get_data(api)
+        except Exception as ex:
+            self.log(f'Error in get_ticket_by_id: {ex}')
+
     def get_ticket_config_items(self, ticket_id: int) -> List[str]:
         """ Gets a list of configuration items attached to a ticket
             - ticket_id: int: The ID of the ticket
@@ -107,16 +178,6 @@ class EzTDX():
             return self._get_data(f'/{self.app_id}/tickets/{ticket_id}/assets')
         except Exception as ex:
             self.log(f'Error in get_ticket_config_items: {ex}')
-
-    def get_ticket_by_id(self, ticket_id: str) -> dict:
-        """ Gets a single ticket by it's id
-            - ticket_id: The ID of the ticket
-        """
-        try:
-            api = f'/{self.app_id}/tickets/{ticket_id}'
-            return self._get_data(api)
-        except Exception as ex:
-            self.log(f'Error in get_ticket_by_id: {ex}')
 
     def get_ticket_description(self, ticket_id: str) -> str:
         """ Get ticket description from ID
@@ -181,6 +242,45 @@ class EzTDX():
         except Exception as ex:
             self.log(f'Error in get_ticket_status_ids: {ex}')
 
+    def get_ticket_tasks(self, ticket_id: int, is_eligible_predecessor: str = '') -> List[dict]:
+        """ Get ticket tasks
+            - ticket_id: int: ID of the ticket you would like to retrieve tasks for
+            - is_eligible_predecessor: str: If true, this will only retrieve ticket 
+                tasks that can be assigned as a predecessor for other ticket tasks. A value of None will return all tasks. (default: blank)
+        """
+        try:
+            api = f'/{self.app_id}/tickets/{ticket_id}/tasks?isEligiblePredecessor={is_eligible_predecessor}'
+
+            # prevents breaking rate limiting
+            sleep(1.125)
+
+            return self._get_data(api)
+        except Exception as ex:
+            self.log(f'Error in get_ticket_tasks: {ex}')
+
+    def get_ticket_task_feed(self, ticket_id: int, task_id: int) -> List[dict]:
+        """ Gets the feed entries for the ticket task.
+            - ticket_id: int: The ticket ID on which the ticket task exists.
+            - task_id: int: The ticket task ID
+        """
+        try:
+            api = f'/{self.app_id}/tickets/{ticket_id}/tasks/{task_id}/feed'
+
+            # prevents breaking rate limiting
+            sleep(1.125)
+
+            return self._get_data(api)
+        except Exception as ex:
+            self.log(f'Error in get_time_types: {ex}')
+
+    def get_time_entry(self, time_id: int) -> dict:
+        """ Get a specific time entry by ID """
+        try:
+            sleep(1.125)
+            return self._get_data(f'/time/{time_id}')
+        except Exception as ex:
+            self.log(f'Error in get_time_types: {ex}')
+
     def get_time_types(self) -> List[str]:
         """Get Time Types"""
         try:
@@ -205,13 +305,38 @@ class EzTDX():
         except Exception as ex:
             self.log(f'Error in get_time_types: {ex}')
 
+    def get_time_type_from_name(self, time_type_name: str) -> int:
+        """ Gets the time type ID from the name """
+        """Get Time Type by ID"""
+        try:
+            api = '/time/types'
+
+            # prevents breaking rate limiting
+            sleep(1.125)
+
+            time_types =  self._get_data(api)
+
+            for time_type in time_types:
+                if time_type['Name'] == time_type_name:
+                    return time_type['ID']
+        except Exception as ex:
+            self.log(f'Error in get_time_type_from_name: {ex}')
+
+    def get_workspace_time_types(self, workspace_id: int) -> List[dict]:
+        """ Gets time types associated with a workspace """
+        try:
+            sleep(1.125)
+            return self._get_data(f'/time/types/component/workspace/{workspace_id}')
+        except Exception as ex:
+            self.log(f'Error in get_workspace_time_types: {ex}')
+
+
     def log(self, msg: str) -> None:
         """Log to file"""
         try:
             now = str(dt.datetime.now())
 
             print(f'{now} - {msg}')
-
         except Exception as ex:
             print(f'Error writing to log: {ex}')
 
@@ -222,6 +347,8 @@ class EzTDX():
         """
         try:
             api = f'/people/lookup?searchText={search_by}&maxResults={max_results}'
+            # prevents breaking rate limiting
+            sleep(1)
             return self._get_data(api)
         except Exception as ex:
             self.log(f'Error in get_people: {ex}')
@@ -291,7 +418,7 @@ class EzTDX():
             self.log(f'Error in search_time: {ex}')
 
 
-    def update_ticket(self, ticket_id: int, comment: str, new_status: str = "None", is_private: bool = False) -> str:
+    def update_ticket(self, ticket_id: int, comment: str, new_status: str = "None", notify_list: List[str]=[], is_private: bool = False) -> str:
         """ Update a ticket feed
             - ticket_id: ID of ticket to be updated
             - new_status: Change the status of the ticket (default: None for no change)
@@ -307,6 +434,7 @@ class EzTDX():
             data = {
                 'NewStatusID': new_status_id,
                 'Comments': comment,
+                'Notify': notify_list,
                 'IsPrivate': is_private
             }
 
@@ -318,3 +446,53 @@ class EzTDX():
                 return f'Ticket {ticket_id} could not be updated.'
         except Exception as ex:
             self.log(f'Error in update_ticket: {ex}')
+
+    def update_ticket_task(self, ticket_id: int, task_id: int, percent_complete: int, title: str, estimated_minutes: int = 60) -> dict:
+        """ Update ticket task
+            - ticket_id: int: Ticket ID
+            - task_id: int: Ticket task ID
+            - percent_complete: int: 0 - 100
+            - title: str: Title of the task
+            - estimated_minutes: int: Estimated minutes of completion (default 60)
+        """
+
+        try:
+            data = {
+                'ID' : task_id,
+                'TicketID' : ticket_id,
+                'Title' : title,
+                'EstimatedMinutes' : estimated_minutes,
+                'PercentComplee' : percent_complete
+            }
+
+            response = self.session.put(f'{self.BASE_URL}/{self.app_id}/tickets/{ticket_id}/tasks/{task_id}', data=data)
+
+            if response.status_code == 200:
+                return json.loads(response.text)
+        except Exception as ex:
+            self.log(f'Error in update_ticket_task: {ex}')
+
+    def update_ticket_task_feed(self, ticket_id: int, task_id: int, percent_complete: int, comments: str, notify: List[str] = [], is_private: bool = False) -> dict:
+        """ Update ticket task feed
+            - ticket_id: int: Ticket ID
+            - task_id: int: Ticket task ID
+            - percent_complete: int: 0 - 100
+            - comments: str: Comments for the feed
+            - notify: List[str]: list of emails to notify (default empty list)
+            - is_private: boolean: is the feed entry private (default False)
+        """
+
+        try:
+            data = {
+                'PercentComplee' : percent_complete,
+                'Comments' : comments,
+                'Notify' : notify,
+                'IsPrivate': is_private
+            }
+
+            response = self.session.post(f'{self.BASE_URL}/{self.app_id}/tickets/{ticket_id}/tasks/{task_id}/feed', data=data)
+
+            if response.status_code == 201:
+                return json.loads(response.text)
+        except Exception as ex:
+            self.log(f'Error in update_ticket_task_feed: {ex}')
