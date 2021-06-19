@@ -32,6 +32,6 @@ setuptools.setup(
     ],
     install_requires=['requests'],
     package_dir={'': 'src'},
-    packages=find_packages(where='src'),
+    packages=setuptools.find_packages(where='src'),
     python_requires='>=3.6',
 )
