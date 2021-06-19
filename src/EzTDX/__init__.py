@@ -25,7 +25,6 @@ __version__ = "2021.06.18.01"
 
 import datetime as dt
 import json
-from requests.models import Response
 from requests.sessions import Session
 from typing import Any, List
 from time import sleep
