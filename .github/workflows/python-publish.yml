@@ -5,7 +5,7 @@ on: push
 jobs:
   build-n-publish:
     name: Publish Python distributions to PyPI and TestPyPI
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@master
     - name: Setup up Python 3.7
