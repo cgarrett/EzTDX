@@ -35,7 +35,7 @@ class EzTDXException(Exception):
 
 class EzTDX():
     def __init__(self, beid: str, web_services_key: str, app_id: int, sandbox: bool = True) -> None:
-        """ initialization """
+        """ initialization """ 
         self.beid = beid
         self.web_services_key = web_services_key
         self.app_id = app_id
