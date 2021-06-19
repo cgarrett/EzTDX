@@ -1,5 +1,5 @@
 import re
-from setuptools import setup, find_packages
+import setuptools
 
 # read version from module
 with open('src/eztdx/__init__.py', 'r') as fo:
@@ -8,7 +8,7 @@ with open('src/eztdx/__init__.py', 'r') as fo:
 with open('README.md', 'r', encoding='utf-8') as fh:
     long_description = fh.read()
 
-setup(
+setuptools.setup(
     name='EzTDX',
     version=version,
     author='Chris Garrett',
