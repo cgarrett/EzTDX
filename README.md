@@ -6,6 +6,8 @@ include Projects, Assets, etc.
 I'm glad you asked. It's meant to be as simple as possible to use and extend. If you follow the code patterns in the EzTDX.py 
 file, you should be able to add new TDX API functionality with ease. To use the library in your project, you need to run ```pip install EzTDX```. Then import it in your application file.
 
+[Searching Tickets](https://youtu.be/xPvckaN6WBA)
+
 ```
 from EzTDX import EzTDX
 
