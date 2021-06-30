@@ -21,7 +21,7 @@
     of any functions that are added.
 """
 
-__version__ = "2021.06.19"
+__version__ = "2021.06.30"
 
 import datetime as dt
 import json
@@ -416,8 +416,21 @@ class EzTDX():
         except Exception as ex:
             self.log(f'Error in search_time: {ex}')
 
+    def update_ticket(self, ticket_id: int, updates: str) -> dict:
+        """ Update ticket
+            - ticket_id: Ticket to be patched.
+            - updates: JSON string in HTTP PATCH notation (http://jsonpatch.com/)
 
-    def update_ticket(self, ticket_id: int, comment: str, new_status: str = "None", notify_list: List[str]=[], is_private: bool = False) -> str:
+        """
+        try:
+            response = self.session.patch(f'{self.BASE_URL}/{self.app_id}/tickets/{ticket_id}', data=updates, headers={'content-type' : 'application/json'})
+
+            if response.status_code == 200:
+                return json.loads(response.text)
+        except Exception as ex:
+            self.log(f'Error in update_ticket: {ex}')
+
+    def update_ticket_feed(self, ticket_id: int, comment: str, new_status: str = "None", notify_list: List[str]=[], is_private: bool = False) -> str:
         """ Update a ticket feed
             - ticket_id: ID of ticket to be updated
             - new_status: Change the status of the ticket (default: None for no change)
