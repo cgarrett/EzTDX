@@ -21,7 +21,7 @@
     of any functions that are added.
 """
 
-__version__ = "2021.06.30"
+__version__ = "2021.08.18"
 
 import datetime as dt
 import json
@@ -122,6 +122,13 @@ class EzTDX():
             return self._get_data(f'/groups/{group_id}/members')
         except Exception as ex:
             self.log(f'Error in get_group_members: {ex}')
+
+    def get_location_by_id(self, location_id: int) -> dict:
+        """Get Location by ID"""
+        try:
+            return self._get_data(f'/locations/{location_id}')
+        except Exception as ex:
+            self.log(f'Error in get_location_by_id: {ex}')
 
     def get_person(self, user_id: str) -> Any:
         """Get User by ID"""

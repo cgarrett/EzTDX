@@ -123,5 +123,6 @@ token.json
 app.py
 
 project-notes.txt
-EzTDX.py
+EzTDX*.py
 app*.py
+_*.py
