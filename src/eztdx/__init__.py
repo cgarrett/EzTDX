@@ -34,7 +34,7 @@ class EzTDXException(Exception):
     pass
 
 class EzTDX():
-    def __init__(self, beid: str, web_services_key: str, app_id: int, sandbox: bool = True) -> None:
+    def __init__(self, api_url: str, beid: str, web_services_key: str, app_id: int, sandbox: bool = True) -> None:
         """ initialization """ 
         self.beid = beid
         self.web_services_key = web_services_key
@@ -44,8 +44,8 @@ class EzTDX():
         self.session = Session()
         self.credentials = {'BEID': self.beid, 'WebServicesKey': self.web_services_key}
 
-        self.sandbox_base_url = 'https://api.teamdynamix.com/SBTDWebApi/api'
-        self.prod_base_url = 'https://api.teamdynamix.com/TDWebApi/api'
+        self.sandbox_base_url = f'{api_url}/SBTDWebApi/api'
+        self.prod_base_url = f'{api_url}/TDWebApi/api'
         self.sandbox = sandbox
 
         if self.sandbox:
