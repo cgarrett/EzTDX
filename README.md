@@ -11,6 +11,8 @@ file, you should be able to add new TDX API functionality with ease. To use the 
 ```
 from EzTDX import EzTDX
 
+API_URL = 'https://yourcompany.teamdynamix.com'
+
 BEID = <BEID>
 WebServicesKey = <Web Services Key>
 
@@ -18,7 +20,7 @@ APP_ID = <Application ID>
 
 if __name__ == '__main__':
 
-    tdx = EzTDX(BEID, WebServicesKey, APP_ID)
+    tdx = EzTDX(API_URL, BEID, WebServicesKey, APP_ID)
 
     tickets = tdx.search_tickets('Directory Update Request', ['New', 'Open', 'Resolved'])
 
@@ -36,7 +38,8 @@ The BEID, Web Services Key, and Application ID should be stored in a secure mann
 ---
 ## Current Functionality
 ### **Initialization**
-```EzTDX(BEID, WebServicesKey, APP_ID, Sandbox)```
+```EzTDX(API_URL, BEID, WebServicesKey, APP_ID, Sandbox)```
+- **API_URL**: TeamDynamix has disallowed connecting to api.teamdynamix.com, you'll now need to use the specific URL provided by TDX.
 - **BEID, WebServicesKey, and APP_ID**: If this is going to be used as part of a UC4 project, these should come from environment variables.
 - **Sandbox**: Boolean value to point to either the test or production environment. *defaults to True so in order to use PROD, you must put False in it's place*
 
